@@ -1,7 +1,6 @@
 // Battle ships board for use over ham radio
 // Jeremy Rifkin 2020
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700&display=swap');
-//@import url('https://fonts.googleapis.com/css?family=Sarpanch:900&display=swap');
 * {
 	font-family: 'Source Sans Pro', sans-serif;
 }
@@ -23,7 +22,6 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	//align-items: stretch;
 }
 #ships {
 	display: flex;
@@ -34,13 +32,12 @@
 	margin: 10px 25px 0;
 	padding: 40px;
 	width: 162px;
-	//height: 170px;
 	border-radius: 10px;
 	@include box_shadow(2);
 	#shipsWrapper {
 		display: flex;
 		flex-wrap: wrap;
-		justify-content: space-between; //flex-start
+		justify-content: space-between;
 		align-content: space-around;
 		.ship {
 			display: flex;
@@ -164,25 +161,6 @@
 			&[data-highlight-invalid][data-ship] {
 				background: mix(#d8a0a0, #666, 40);
 			}
-			/*&[data-sunk] {
-				&:before, &:after {
-					content: "";
-					position: absolute;
-					top: 50%;
-					left: 50%;
-					width: 15px;
-					height: 4px;
-					background: #fff;
-					opacity: .7;
-					mix-blend-mode: multiply;
-				}
-				&:before {
-					transform: translate(-50%, -50%) rotate(-45deg);
-				}
-				&:after {
-					transform: translate(-50%, -50%) rotate(45deg);
-				}
-			}*/
 		}
 	}
 }
