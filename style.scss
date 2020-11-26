@@ -1,0 +1,198 @@
+// Battle ships board for use over ham radio
+// Jeremy Rifkin 2020
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700&display=swap');
+//@import url('https://fonts.googleapis.com/css?family=Sarpanch:900&display=swap');
+* {
+	font-family: 'Source Sans Pro', sans-serif;
+}
+@mixin box_shadow ($level) {
+    @if $level == 1 {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    } @else if $level == 2 {
+        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    } @else if $level == 3 {
+        box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    } @else if $level == 4 {
+        box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    } @else if $level == 5 {
+        box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+    }
+}
+
+#main {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	//align-items: stretch;
+}
+#ships {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+	align-content: stretch;
+	margin: 10px 25px 0;
+	padding: 40px;
+	width: 162px;
+	//height: 170px;
+	border-radius: 10px;
+	@include box_shadow(2);
+	#shipsWrapper {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between; //flex-start
+		align-content: space-around;
+		.ship {
+			display: flex;
+			padding: 5px;
+			cursor: pointer;
+			position: relative;
+			.hull {
+				width: 20px;
+				height: 20px;
+				background: #999;
+				&:not(:last-child) {
+					margin-right: 2px;
+				}
+			}
+			&[data-placed] .hull {
+				background: #BBB;
+			}
+		}
+	}
+	.button {
+		background: #CCC;
+		color: white;
+		border-radius: 4px;
+		padding: 10px;
+		text-align: center;
+		margin-top: 10px;
+		cursor: pointer;
+	}
+	#cancelPlace {
+		&[data-enabled] {
+			background: #f75555;
+			&:hover {
+				background: darken(#f75555, 10%);
+			}
+		}
+	}
+	#rotatePlace {
+		&[data-enabled] {
+			background: #5584f7;
+			&:hover {
+				background: darken(#5584f7, 10%);
+			}
+		}
+	}
+	#reset {
+		background: #935beb;
+		&:hover {
+			background: darken(#935beb, 10%);
+		}
+	}
+}
+.board {
+	margin: 0 10px;
+	border-spacing: 0;
+	th {
+		font-size: 20px;
+		letter-spacing: 1px;
+		padding-bottom: 4px;
+		font-weight: 600;
+		border: 1px solid #fff;
+	}
+	td {
+		width: 25px;
+		height: 25px;
+		background: #DDD;
+		text-align: center;
+		border: 1px solid #fff;
+		position: relative;
+		&.coordinate {
+			font-weight: 600;
+		}
+		&.cell {
+			cursor: pointer;
+			&[data-active] {
+				background: #AAA;
+				&[data-ship] {
+					background: #ee8085;
+				}
+				&[data-hull-right]:after {
+					background: #ee8085;
+				}
+				&[data-hull-bottom]:after {
+					background: #ee8085;
+				}
+			}
+			&[data-ship] {
+				background: #666;
+			}
+			&[data-hull-right] {
+				&:after {
+					content: "";
+					position: absolute;
+					top: 50%;
+					left: 100%;
+					transform: translateY(-50%);
+					width: 2px;
+					height: 13px;
+					background: #666;
+					z-index: 1;
+				}
+			}
+			&[data-hull-bottom] {
+				&:after {
+					content: "";
+					position: absolute;
+					top: 100%;
+					left: 50%;
+					transform: translateX(-50%);
+					height: 2px;
+					width: 13px;
+					background: #666;
+					z-index: 1;
+				}
+			}
+			&[data-highlight] {
+				background: #a0d2d8;
+			}
+			&[data-highlight-invalid] {
+				background: #d8a0a0;
+			}
+			&[data-highlight-invalid][data-ship] {
+				background: mix(#d8a0a0, #666, 40);
+			}
+			/*&[data-sunk] {
+				&:before, &:after {
+					content: "";
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					width: 15px;
+					height: 4px;
+					background: #fff;
+					opacity: .7;
+					mix-blend-mode: multiply;
+				}
+				&:before {
+					transform: translate(-50%, -50%) rotate(-45deg);
+				}
+				&:after {
+					transform: translate(-50%, -50%) rotate(45deg);
+				}
+			}*/
+		}
+	}
+}
+
+#footer {
+	width: 20%;
+	font-size: 16px;
+	text-align: center;
+	margin: 40px auto 0;
+	.heart {
+		color: #ff4262;
+	}
+}

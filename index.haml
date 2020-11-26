@@ -1,0 +1,46 @@
+-# Battle ships board for use over ham radio
+-# Jeremy Rifkin 2020
+%link{:rel => "stylesheet", :href => "style.css"}
+%div#main
+	%table.board#player
+		%thead
+			%tr
+				%th{:colspan=>11}
+					You
+		%tbody
+			%tr
+				- ("A".."J").to_a.unshift(" ").each do |i|
+					%td.coordinate #{i}
+			- (1..10).each do |i|
+				%tr
+					%td.coordinate #{i}
+					- ("A".."J").each do |j|
+						%td.cell
+	%div#ships
+		%div#shipsWrapper
+		%div.button#cancelPlace Cancel
+		%div.button#rotatePlace Rotate
+		%div.button#reset Reset Boards
+	%table.board#enemy
+		%thead
+			%tr
+				%th{:colspan=>11}
+					You Enemy
+		%tbody
+			%tr
+				- ("A".."J").to_a.unshift(" ").each do |i|
+					%td.coordinate #{i}
+			- (1..10).each do |i|
+				%tr
+					%td.coordinate #{i}
+					- ("A".."J").each do |j|
+						%td.cell
+
+%div#footer
+	Made with
+	%span.heart &#10084;
+	by Jeremy Rifkin
+	%br
+	Tips: you can rotate ships by pressing "r" while in placement mode. Click once on the enemy board to mark a cell; click again to mark as a hit. You can clear cells on the enemy board by pressing rightclick.
+
+%script{:src => "script.js"}
