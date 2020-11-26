@@ -3,7 +3,7 @@
 class Board {
 	board: HTMLElement;
 	grid: HTMLElement[][];
-	constructor(element) {
+	constructor(element: HTMLElement) {
 		this.board = element;
 		this.grid = [];
 		let trs = this.board.getElementsByTagName("tr");
@@ -21,7 +21,7 @@ class Board {
 	}
 }
 class EnemyBoard extends Board {
-	constructor(element) {
+	constructor(element: HTMLElement) {
 		super(element);
 		this.initGrid();
 	}
@@ -62,35 +62,38 @@ class EnemyBoard extends Board {
 	}
 }
 class PlayerBoard extends Board {
+	// TODO: I've used a lot off non-null assertions in this code that are probably seen as bad
+	// practice by an experienced TS dev.
 	shipsElem: HTMLElement;
 	placingShip: number;
-	ship: HTMLElement;
+	ship: HTMLElement | null;
 	ships: HTMLElement[];
 	direction_row: boolean;
-	lastHover: number[];
+	lastHover: number[] | null;
 	cancelPlace: HTMLElement;
 	rotatePlace: HTMLElement;
-	constructor(element) {
+	constructor(element: HTMLElement) {
 		super(element);
-		this.shipsElem = document.getElementById("shipsWrapper");
-		this.placingShip = 0;
+		this.shipsElem = document.getElementById("shipsWrapper")!;
+		this.placingShip = +false;
 		this.ship = null;
 		this.ships = [];
 		this.direction_row = true;
 		this.lastHover = null;
-		this.cancelPlace = document.getElementById("cancelPlace");
-		this.rotatePlace = document.getElementById("rotatePlace");
+		this.cancelPlace = document.getElementById("cancelPlace")!;
+		this.rotatePlace = document.getElementById("rotatePlace")!;
 		this.initGrid();
 		this.initShips();
 	}
 	reset() {
-		this.placingShip = 0;
+		this.placingShip = +false;
 		this.ship = null;
 		this.direction_row = true;
 		this.lastHover = null;
 		for(let row of this.grid)
 			for(let cell of row)
-				for(let attr of ["data-active", "data-highlight", "data-highlight-invalid", "data-ship", "data-hull-right", "data-hull-bottom"])
+				for(let attr of ["data-active", "data-highlight", "data-highlight-invalid",
+					"data-ship", "data-hull-right", "data-hull-bottom"])
 					cell.removeAttribute(attr);
 		for(let ship of this.ships)
 			ship.removeAttribute("data-placed");
@@ -105,10 +108,10 @@ class PlayerBoard extends Board {
 					if((e.which || e.button) != 1)
 						return;
 					if(this.placingShip) {
-						let r = parseInt((e.target as HTMLElement).getAttribute("data-row")),
-							c = parseInt((e.target as HTMLElement).getAttribute("data-col"));
+						let r = parseInt((e.target as HTMLElement).getAttribute("data-row")!),
+							c = parseInt((e.target as HTMLElement).getAttribute("data-col")!);
 						if(this.placeShip(r, c)) {
-							this.ship.setAttribute("data-placed", "");
+							(this.ship as HTMLElement).setAttribute("data-placed", "");
 							this.endShipPlacement();
 						}
 					} else {
@@ -122,21 +125,21 @@ class PlayerBoard extends Board {
 					if(this.placingShip) {
 						this.clearHighlight();
 						// highlight
-						let r = parseInt((e.target as HTMLElement).getAttribute("data-row")),
-							c = parseInt((e.target as HTMLElement).getAttribute("data-col"));
+						let r = parseInt((e.target as HTMLElement).getAttribute("data-row")!),
+							c = parseInt((e.target as HTMLElement).getAttribute("data-col")!);
 						this.lastHover = [r, c];
 						this.doHighlight(r, c);
 					}
 				}, false);
 				cell.addEventListener("mouseout", e => {
-					if(this.placingShip && (e.relatedTarget == null || !(e.relatedTarget as HTMLElement).hasAttribute("data-grid")))
+					if(this.placingShip && (e.relatedTarget == null ||
+						!(e.relatedTarget as HTMLElement).hasAttribute("data-grid")))
 						this.clearHighlight();
 				}, false);
 			}
 		}
 	}
 	initShips() {
-		//for(let d of [6, 4, 4, 3, 3, 3, 2, 2, 2, 2]) {
 		for(let d of [6, 4, 2, 4, 2, 3, 2, 3, 2, 3]) {
 			let ship = document.createElement("div");
 			ship.setAttribute("class", "ship");
@@ -146,7 +149,7 @@ class PlayerBoard extends Board {
 				ship.appendChild(hull);
 			}
 			let shipclass = d;
-			ship.addEventListener("mousedown", e => {
+			ship.addEventListener("mousedown", () => {
 				if(!ship.hasAttribute("data-placed")) {
 					this.ship = ship;
 					this.placingShip = shipclass;
@@ -157,12 +160,12 @@ class PlayerBoard extends Board {
 			this.ships.push(ship);
 			this.shipsElem.appendChild(ship);
 		}
-		this.cancelPlace.addEventListener("mousedown", e => {
-			this.placingShip = 0;
+		this.cancelPlace.addEventListener("mousedown", () => {
+			this.placingShip = +false;
 			this.endShipPlacement();
 			this.clearHighlight();
 		}, false);
-		this.rotatePlace.addEventListener("mousedown", e => {
+		this.rotatePlace.addEventListener("mousedown", () => {
 			this.direction_row = !this.direction_row;
 		}, false);
 		window.addEventListener("keypress", e => {
@@ -179,7 +182,7 @@ class PlayerBoard extends Board {
 		}, false);
 	}
 	endShipPlacement() {
-		this.placingShip = 0;
+		this.placingShip = +false;
 		this.ship = null;
 		this.clearHighlight();
 		this.cancelPlace.removeAttribute("data-enabled");
@@ -196,7 +199,7 @@ class PlayerBoard extends Board {
 		}
 		this.lastHover = null;
 	}
-	doHighlight(r, c) {
+	doHighlight(r: number, c: number) {
 		if(this.direction_row) {
 			c -= Math.ceil(this.placingShip / 2) - 1;
 			if(c <= 0)
@@ -235,7 +238,7 @@ class PlayerBoard extends Board {
 			}
 		}
 	}
-	placeShip(r, c) {
+	placeShip(r: number, c: number) {
 		if(this.direction_row) {
 			c -= Math.ceil(this.placingShip / 2) - 1;
 			if(c <= 0)
@@ -285,10 +288,10 @@ class PlayerBoard extends Board {
 	}
 }
 
-let you = new PlayerBoard(document.getElementById("player")),
-	enemy = new EnemyBoard(document.getElementById("enemy"));
+let you = new PlayerBoard(document.getElementById("player")!),
+	enemy = new EnemyBoard(document.getElementById("enemy")!);
 
-document.getElementById("reset").addEventListener("click", () => {
+document.getElementById("reset")!.addEventListener("click", () => {
 	you.reset();
 	enemy.reset();
 }, false);
