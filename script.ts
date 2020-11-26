@@ -64,32 +64,32 @@ class EnemyBoard extends Board {
 class PlayerBoard extends Board {
 	// TODO: I've used a lot off non-null assertions in this code that are probably seen as bad
 	// practice by an experienced TS dev.
-	shipsElem: HTMLElement;
-	placingShip: number;
+	ships_elem: HTMLElement;
+	placing_ship: number;
 	ship: HTMLElement | null;
 	ships: HTMLElement[];
 	direction_row: boolean;
-	lastHover: number[] | null;
-	cancelPlace: HTMLElement;
-	rotatePlace: HTMLElement;
+	last_hover: number[] | null;
+	cancel_place: HTMLElement;
+	rotate_place: HTMLElement;
 	constructor(element: HTMLElement) {
 		super(element);
-		this.shipsElem = document.getElementById("shipsWrapper")!;
-		this.placingShip = +false;
+		this.ships_elem = document.getElementById("shipsWrapper")!;
+		this.placing_ship = +false;
 		this.ship = null;
 		this.ships = [];
 		this.direction_row = true;
-		this.lastHover = null;
-		this.cancelPlace = document.getElementById("cancelPlace")!;
-		this.rotatePlace = document.getElementById("rotatePlace")!;
+		this.last_hover = null;
+		this.cancel_place = document.getElementById("cancelPlace")!;
+		this.rotate_place = document.getElementById("rotatePlace")!;
 		this.initGrid();
 		this.initShips();
 	}
 	reset() {
-		this.placingShip = +false;
+		this.placing_ship = +false;
 		this.ship = null;
 		this.direction_row = true;
-		this.lastHover = null;
+		this.last_hover = null;
 		for(let row of this.grid)
 			for(let cell of row)
 				for(let attr of ["data-active", "data-highlight", "data-highlight-invalid",
@@ -97,8 +97,8 @@ class PlayerBoard extends Board {
 					cell.removeAttribute(attr);
 		for(let ship of this.ships)
 			ship.removeAttribute("data-placed");
-		this.cancelPlace.removeAttribute("data-enabled");
-		this.rotatePlace.removeAttribute("data-enabled");
+		this.cancel_place.removeAttribute("data-enabled");
+		this.rotate_place.removeAttribute("data-enabled");
 	}
 	initGrid() {
 		for(let row of this.grid) {
@@ -107,7 +107,7 @@ class PlayerBoard extends Board {
 				cell.addEventListener("mousedown", e => {
 					if((e.which || e.button) != 1)
 						return;
-					if(this.placingShip) {
+					if(this.placing_ship) {
 						let r = parseInt((e.target as HTMLElement).getAttribute("data-row")!),
 							c = parseInt((e.target as HTMLElement).getAttribute("data-col")!);
 						if(this.placeShip(r, c)) {
@@ -122,17 +122,17 @@ class PlayerBoard extends Board {
 					}
 				}, false);
 				cell.addEventListener("mouseover", e => {
-					if(this.placingShip) {
+					if(this.placing_ship) {
 						this.clearHighlight();
 						// highlight
 						let r = parseInt((e.target as HTMLElement).getAttribute("data-row")!),
 							c = parseInt((e.target as HTMLElement).getAttribute("data-col")!);
-						this.lastHover = [r, c];
+						this.last_hover = [r, c];
 						this.doHighlight(r, c);
 					}
 				}, false);
 				cell.addEventListener("mouseout", e => {
-					if(this.placingShip && (e.relatedTarget == null ||
+					if(this.placing_ship && (e.relatedTarget == null ||
 						!(e.relatedTarget as HTMLElement).hasAttribute("data-grid")))
 						this.clearHighlight();
 				}, false);
@@ -152,41 +152,41 @@ class PlayerBoard extends Board {
 			ship.addEventListener("mousedown", () => {
 				if(!ship.hasAttribute("data-placed")) {
 					this.ship = ship;
-					this.placingShip = shipclass;
-					this.cancelPlace.setAttribute("data-enabled", "");
-					this.rotatePlace.setAttribute("data-enabled", "");
+					this.placing_ship = shipclass;
+					this.cancel_place.setAttribute("data-enabled", "");
+					this.rotate_place.setAttribute("data-enabled", "");
 				}
 			}, false);
 			this.ships.push(ship);
-			this.shipsElem.appendChild(ship);
+			this.ships_elem.appendChild(ship);
 		}
-		this.cancelPlace.addEventListener("mousedown", () => {
-			this.placingShip = +false;
+		this.cancel_place.addEventListener("mousedown", () => {
+			this.placing_ship = +false;
 			this.endShipPlacement();
 			this.clearHighlight();
 		}, false);
-		this.rotatePlace.addEventListener("mousedown", () => {
+		this.rotate_place.addEventListener("mousedown", () => {
 			this.direction_row = !this.direction_row;
 		}, false);
 		window.addEventListener("keypress", e => {
-			if(this.placingShip) {
+			if(this.placing_ship) {
 				if(e.key == "r" || e.key == "R")
 					this.direction_row = !this.direction_row;
-				if(this.lastHover != null) {
-					let _lastHover = this.lastHover;
+				if(this.last_hover != null) {
+					let _lastHover = this.last_hover;
 					this.clearHighlight();
 					this.doHighlight(_lastHover[0], _lastHover[1]);
-					this.lastHover = _lastHover;
+					this.last_hover = _lastHover;
 				}
 			}
 		}, false);
 	}
 	endShipPlacement() {
-		this.placingShip = +false;
+		this.placing_ship = +false;
 		this.ship = null;
 		this.clearHighlight();
-		this.cancelPlace.removeAttribute("data-enabled");
-		this.rotatePlace.removeAttribute("data-enabled");
+		this.cancel_place.removeAttribute("data-enabled");
+		this.rotate_place.removeAttribute("data-enabled");
 		this.direction_row = true;
 	}
 	clearHighlight() {
@@ -197,41 +197,41 @@ class PlayerBoard extends Board {
 				c.removeAttribute("data-highlight-invalid");
 			}
 		}
-		this.lastHover = null;
+		this.last_hover = null;
 	}
 	doHighlight(r: number, c: number) {
 		if(this.direction_row) {
-			c -= Math.ceil(this.placingShip / 2) - 1;
+			c -= Math.ceil(this.placing_ship / 2) - 1;
 			if(c <= 0)
 				c = 0;
-			if(c + this.placingShip >= this.grid[r].length)
-				c = this.grid[r].length - this.placingShip;
+			if(c + this.placing_ship >= this.grid[r].length)
+				c = this.grid[r].length - this.placing_ship;
 			let valid = true;
-			for(let _c = 0; _c < this.placingShip; _c++) {
+			for(let _c = 0; _c < this.placing_ship; _c++) {
 				if(c + _c >= this.grid[r].length) // safeguard
 					break;
 				if(this.grid[r][c + _c].hasAttribute("data-ship"))
 					valid = false;
 			}
-			for(let _c = 0; _c < this.placingShip; _c++) {
+			for(let _c = 0; _c < this.placing_ship; _c++) {
 				if(c + _c >= this.grid[r].length) // safeguard
 					break;
 				this.grid[r][c + _c].setAttribute(valid ? "data-highlight" : "data-highlight-invalid", "");
 			}
 		} else {
-			r -= Math.ceil(this.placingShip / 2) - 1;
+			r -= Math.ceil(this.placing_ship / 2) - 1;
 			if(r <= 0)
 				r = 0;
-			if(r + this.placingShip >= this.grid.length)
-				r = this.grid.length - this.placingShip;
+			if(r + this.placing_ship >= this.grid.length)
+				r = this.grid.length - this.placing_ship;
 			let valid = true;
-			for(let _r = 0; _r < this.placingShip; _r++) {
+			for(let _r = 0; _r < this.placing_ship; _r++) {
 				if(r + _r >= this.grid.length) // safeguard
 					break;
 				if(this.grid[r + _r][c].hasAttribute("data-ship"))
 					valid = false;
 			}
-			for(let _r = 0; _r < this.placingShip; _r++) {
+			for(let _r = 0; _r < this.placing_ship; _r++) {
 				if(r + _r >= this.grid.length) // safeguard
 					break;
 				this.grid[r + _r][c].setAttribute(valid ? "data-highlight" : "data-highlight-invalid", "");
@@ -240,13 +240,13 @@ class PlayerBoard extends Board {
 	}
 	placeShip(r: number, c: number) {
 		if(this.direction_row) {
-			c -= Math.ceil(this.placingShip / 2) - 1;
+			c -= Math.ceil(this.placing_ship / 2) - 1;
 			if(c <= 0)
 				c = 0;
-			if(c + this.placingShip >= this.grid[r].length)
-				c = this.grid[r].length - this.placingShip;
+			if(c + this.placing_ship >= this.grid[r].length)
+				c = this.grid[r].length - this.placing_ship;
 			let valid = true;
-			for(let _c = 0; _c < this.placingShip; _c++) {
+			for(let _c = 0; _c < this.placing_ship; _c++) {
 				if(c + _c >= this.grid[r].length) // safeguard
 					break;
 				if(this.grid[r][c + _c].hasAttribute("data-ship"))
@@ -254,21 +254,21 @@ class PlayerBoard extends Board {
 			}
 			if(!valid)
 				return false;
-			for(let _c = 0; _c < this.placingShip; _c++) {
+			for(let _c = 0; _c < this.placing_ship; _c++) {
 				if(c + _c >= this.grid[r].length) // safeguard
 					break;
 				this.grid[r][c + _c].setAttribute("data-ship", "");
-				if(_c != this.placingShip - 1)
+				if(_c != this.placing_ship - 1)
 					this.grid[r][c + _c].setAttribute("data-hull-right", "");
 			}
 		} else {
-			r -= Math.ceil(this.placingShip / 2) - 1;
+			r -= Math.ceil(this.placing_ship / 2) - 1;
 			if(r <= 0)
 				r = 0;
-			if(r + this.placingShip >= this.grid.length)
-				r = this.grid.length - this.placingShip;
+			if(r + this.placing_ship >= this.grid.length)
+				r = this.grid.length - this.placing_ship;
 			let valid = true;
-			for(let _r = 0; _r < this.placingShip; _r++) {
+			for(let _r = 0; _r < this.placing_ship; _r++) {
 				if(r + _r >= this.grid.length) // safeguard
 					break;
 				if(this.grid[r + _r][c].hasAttribute("data-ship"))
@@ -276,11 +276,11 @@ class PlayerBoard extends Board {
 			}
 			if(!valid)
 				return false;
-			for(let _r = 0; _r < this.placingShip; _r++) {
+			for(let _r = 0; _r < this.placing_ship; _r++) {
 				if(r + _r >= this.grid.length) // safeguard
 					break;
 				this.grid[r + _r][c].setAttribute("data-ship", "");
-				if(_r != this.placingShip - 1)
+				if(_r != this.placing_ship - 1)
 					this.grid[r + _r][c].setAttribute("data-hull-bottom", "");
 			}
 		}
