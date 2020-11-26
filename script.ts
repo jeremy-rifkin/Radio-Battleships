@@ -1,16 +1,18 @@
 // Battle ships board for use over ham radio
 // Jeremy Rifkin 2020
 class Board {
+	board: HTMLElement;
+	grid: HTMLElement[][];
 	constructor(element) {
 		this.board = element;
 		this.grid = [];
 		let trs = this.board.getElementsByTagName("tr");
 		for(let i = 2, l = trs.length; i < l; i++) {
 			let tds = trs[i].getElementsByTagName("td"),
-				cells = [];
+				cells: HTMLElement[] = [];
 			for(let j = 1, ll = tds.length; j < ll; j++) {
-				tds[j].setAttribute("data-row", i - 2);
-				tds[j].setAttribute("data-col", j - 1);
+				tds[j].setAttribute("data-row", (i - 2).toString());
+				tds[j].setAttribute("data-col", (j - 1).toString());
 				tds[j].setAttribute("data-grid", "");
 				cells.push(tds[j]);
 			}
@@ -60,10 +62,18 @@ class EnemyBoard extends Board {
 	}
 }
 class PlayerBoard extends Board {
+	shipsElem: HTMLElement;
+	placingShip: number;
+	ship: HTMLElement;
+	ships: HTMLElement[];
+	direction_row: boolean;
+	lastHover: number[];
+	cancelPlace: HTMLElement;
+	rotatePlace: HTMLElement;
 	constructor(element) {
 		super(element);
 		this.shipsElem = document.getElementById("shipsWrapper");
-		this.placingShip = false;
+		this.placingShip = 0;
 		this.ship = null;
 		this.ships = [];
 		this.direction_row = true;
@@ -74,7 +84,7 @@ class PlayerBoard extends Board {
 		this.initShips();
 	}
 	reset() {
-		this.placingShip = false;
+		this.placingShip = 0;
 		this.ship = null;
 		this.direction_row = true;
 		this.lastHover = null;
@@ -95,8 +105,8 @@ class PlayerBoard extends Board {
 					if((e.which || e.button) != 1)
 						return;
 					if(this.placingShip) {
-						let r = parseInt(e.target.getAttribute("data-row")),
-							c = parseInt(e.target.getAttribute("data-col"));
+						let r = parseInt((e.target as HTMLElement).getAttribute("data-row")),
+							c = parseInt((e.target as HTMLElement).getAttribute("data-col"));
 						if(this.placeShip(r, c)) {
 							this.ship.setAttribute("data-placed", "");
 							this.endShipPlacement();
@@ -112,14 +122,14 @@ class PlayerBoard extends Board {
 					if(this.placingShip) {
 						this.clearHighlight();
 						// highlight
-						let r = parseInt(e.target.getAttribute("data-row")),
-							c = parseInt(e.target.getAttribute("data-col"));
+						let r = parseInt((e.target as HTMLElement).getAttribute("data-row")),
+							c = parseInt((e.target as HTMLElement).getAttribute("data-col"));
 						this.lastHover = [r, c];
 						this.doHighlight(r, c);
 					}
 				}, false);
 				cell.addEventListener("mouseout", e => {
-					if(this.placingShip && (e.relatedTarget == null || !e.relatedTarget.hasAttribute("data-grid")))
+					if(this.placingShip && (e.relatedTarget == null || !(e.relatedTarget as HTMLElement).hasAttribute("data-grid")))
 						this.clearHighlight();
 				}, false);
 			}
@@ -148,7 +158,7 @@ class PlayerBoard extends Board {
 			this.shipsElem.appendChild(ship);
 		}
 		this.cancelPlace.addEventListener("mousedown", e => {
-			this.placingShip = false;
+			this.placingShip = 0;
 			this.endShipPlacement();
 			this.clearHighlight();
 		}, false);
@@ -169,7 +179,7 @@ class PlayerBoard extends Board {
 		}, false);
 	}
 	endShipPlacement() {
-		this.placingShip = false;
+		this.placingShip = 0;
 		this.ship = null;
 		this.clearHighlight();
 		this.cancelPlace.removeAttribute("data-enabled");
